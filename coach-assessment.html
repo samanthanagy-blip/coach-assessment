@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESPECT Styles Assessment — Coach</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f7f7f5; color: #1a1a1a; min-height: 100vh; }
+  .container { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
+  .header { margin-bottom: 40px; }
+  .header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  .header p { margin-top: 8px; font-size: 14px; color: #666; line-height: 1.6; }
+  .section { background: #fff; border-radius: 12px; padding: 28px; margin-bottom: 20px; border: 1px solid #e8e8e6; }
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #999; margin-bottom: 16px; }
+  .question { font-size: 15px; font-weight: 500; margin-bottom: 6px; line-height: 1.5; }
+  .sub { font-size: 13px; color: #888; margin-bottom: 18px; }
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+  .field input[type="text"] { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa; outline: none; }
+  .field input[type="text"]:focus { border-color: #4a4a4a; background: #fff; }
+  .option { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0ee; cursor: pointer; }
+  .option:last-of-type { border-bottom: none; }
+  .option input { margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; }
+  .option-text { font-size: 14px; line-height: 1.5; color: #333; }
+  .option-num { font-size: 13px; font-weight: 600; color: #999; min-width: 18px; }
+  .counter { font-size: 12px; color: #aaa; margin-top: 10px; }
+  .other-field { margin-top: 14px; display: none; }
+  .other-label { font-size: 12px; color: #999; margin-bottom: 6px; }
+  .other-field input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #fafafa; outline: none; }
+  .btn { display: block; width: 100%; padding: 14px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 28px; }
+  .btn:hover { background: #333; }
+  .error { font-size: 13px; color: #c0392b; margin-top: 8px; display: none; }
+  #results { display: none; }
+  .results-header { background: #1a1a1a; color: #fff; border-radius: 12px; padding: 32px; margin-bottom: 20px; }
+  .results-header .name { font-size: 13px; color: #aaa; margin-bottom: 4px; }
+  .results-header h2 { font-size: 24px; font-weight: 600; }
+  .results-header p { font-size: 14px; color: #ccc; margin-top: 8px; line-height: 1.5; }
+  .screenshot-note { font-size: 13px; color: #f5c542; margin-top: 14px; line-height: 1.5; }
+  .res-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #999; margin-bottom: 12px; }
+  .role-card { background: #f7f7f5; border-radius: 10px; padding: 20px 20px 20px 22px; margin-bottom: 10px; border: 1px solid #e8e8e6; border-left: 4px solid #e8e8e6; }
+  .role-card.is-primary { border-left-color: #1a1a1a; }
+  .role-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .role-card-name { font-size: 16px; font-weight: 600; }
+  .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.4px; text-transform: uppercase; }
+  .badge-primary { background: #1a1a1a; color: #fff; }
+  .badge-secondary { background: #e8e8e6; color: #666; }
+  .role-card-desc { font-size: 14px; color: #555; line-height: 1.55; }
+  .style-card { background: #f7f7f5; border-radius: 10px; padding: 20px; border: 1px solid #e8e8e6; }
+  .style-card-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .style-card-desc { font-size: 14px; color: #555; line-height: 1.55; }
+  .focus-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { background: #f0f0ee; border: 1px solid #e8e8e6; padding: 6px 13px; border-radius: 20px; font-size: 13px; color: #444; }
+  .res-block { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 16px; border: 1px solid #e8e8e6; }
+  .disclaimer { font-size: 11px; color: #bbb; text-align: center; margin-top: 28px; line-height: 1.7; padding: 0 8px; }
+  .restart { display: block; text-align: center; font-size: 13px; color: #999; margin-top: 16px; cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ── FORM VIEW ── -->
+  <div id="form-view">
+    <div class="header">
+      <h1>RESPECT Styles Assessment</h1>
+      <p>Your responses help us understand your coaching strengths and preferred style. A summary will be shared with your members before their first session with you.</p>
+    </div>
+
+    <!-- Info -->
+    <div class="section">
+      <div class="section-label">Your Information</div>
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="fullName" placeholder="First and last name">
+      </div>
+      <div class="field">
+        <label>BetterUp email address</label>
+        <input type="text" id="email" placeholder="you@betterup.com">
+      </div>
+      <div class="error" id="info-error">Please enter your name and email address.</div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="section">
+      <div class="section-label">Question 1 of 11</div>
+      <div class="question">When you coach, which 3 of these do you help people with most?</div>
+      <div class="sub">Pick 3</div>
+      <label class="option"><input type="checkbox" name="q1" value="Rallier"><span class="option-text">Getting motivated and taking action on their goals</span></label>
+      <label class="option"><input type="checkbox" name="q1" value="Educator"><span class="option-text">Developing skills to be more effective in their role</span></label>
+      <label class="option"><input type="checkbox" name="q1" value="Strategist"><span class="option-text">Thinking through complex problems or high-stakes situations</span></label>
+      <label class="option"><input type="checkbox" name="q1" value="Provocateur"><span class="option-text">Challenging their thinking and questioning their assumptions</span></label>
+      <label class="option"><input type="checkbox" name="q1" value="Explorer"><span class="option-text">Generating new ideas and broadening their perspective</span></label>
+      <label class="option"><input type="checkbox" name="q1" value="Confidant"><span class="option-text">Creating a safe space to speak openly and authentically</span></label>
+      <label class="option"><input type="checkbox" name="q1" value="Transformer"><span class="option-text">Growing into their full potential</span></label>
+      <div class="counter" id="q1-counter">0 of 3 selected</div>
+      <div class="error" id="q1-error">Please select exactly 3 options.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="section">
+      <div class="section-label">Question 2 of 11</div>
+      <div class="question">When sharing observations or feedback, I prefer to be:</div>
+      <div class="sub">Select one</div>
+      <label class="option"><input type="radio" name="q2" value="1"><span class="option-num">1.</span><span class="option-text">Very direct — straightforward, even if it's uncomfortable</span></label>
+      <label class="option"><input type="radio" name="q2" value="2"><span class="option-num">2.</span><span class="option-text">Balanced — direct while still being considerate</span></label>
+      <label class="option"><input type="radio" name="q2" value="3"><span class="option-num">3.</span><span class="option-text">Tactful — thoughtful and considerate when sharing observations</span></label>
+      <div class="error" id="q2-error">Please select one option.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="section">
+      <div class="section-label">Question 3 of 11</div>
+      <div class="question">When helping people work through challenges, I prefer to:</div>
+      <div class="sub">Select one</div>
+      <label class="option"><input type="radio" name="q3" value="1"><span class="option-num">1.</span><span class="option-text">Lean toward sharing my perspective and feedback</span></label>
+      <label class="option"><input type="radio" name="q3" value="2"><span class="option-num">2.</span><span class="option-text">Balance sharing my perspective with asking questions</span></label>
+      <label class="option"><input type="radio" name="q3" value="3"><span class="option-num">3.</span><span class="option-text">Lean toward asking questions that help them find their own answers</span></label>
+      <div class="error" id="q3-error">Please select one option.</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="section">
+      <div class="section-label">Question 4 of 11</div>
+      <div class="question">My coaching engagement was successful because I helped them…</div>
+      <div class="sub">Pick 3</div>
+      <label class="option"><input type="checkbox" name="q4" value="Rallier"><span class="option-text">Take more action</span></label>
+      <label class="option"><input type="checkbox" name="q4" value="Educator"><span class="option-text">Gain new capabilities</span></label>
+      <label class="option"><input type="checkbox" name="q4" value="Strategist"><span class="option-text">Solve complex problems</span></label>
+      <label class="option"><input type="checkbox" name="q4" value="Provocateur"><span class="option-text">Challenge their thinking and face uncomfortable truths</span></label>
+      <label class="option"><input type="checkbox" name="q4" value="Explorer"><span class="option-text">Explore new possibilities</span></label>
+      <label class="option"><input type="checkbox" name="q4" value="Confidant"><span class="option-text">Feel supported and understood</span></label>
+      <label class="option"><input type="checkbox" name="q4" value="Transformer"><span class="option-text">Become their best self</span></label>
+      <div class="counter" id="q4-counter">0 of 3 selected</div>
+      <div class="error" id="q4-error">Please select exactly 3 options.</div>
+    </div>
+
+    <!-- Q5A -->
+    <div class="section">
+      <div class="section-label">Question 5 of 11</div>
+      <div class="question">In which area do you have the most coaching experience?</div>
+      <div class="sub">Select one</div>
+      <label class="option"><input type="radio" name="q5a" value="Leadership and Management"><span class="option-text">Leadership and Management</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Executive (VP to C-suite)"><span class="option-text">Executive (VP to C-suite)</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Career and Transition"><span class="option-text">Career and Transition</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Health and Well-being"><span class="option-text">Health and Well-being</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Performance and Skill Development"><span class="option-text">Performance and Skill Development</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Entrepreneurial"><span class="option-text">Entrepreneurial</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Interpersonal Dynamics"><span class="option-text">Interpersonal Dynamics</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Meaning and Purpose"><span class="option-text">Meaning and Purpose</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Communication and Presentation Skills"><span class="option-text">Communication and Presentation Skills</span></label>
+      <label class="option"><input type="radio" name="q5a" value="__other__"><span class="option-text">Other</span></label>
+      <div class="other-field" id="q5a-other-wrap">
+        <div class="other-label">Please specify:</div>
+        <input type="text" id="q5aother" placeholder="Your primary specialty...">
+      </div>
+      <div class="error" id="q5a-error">Please select one option.</div>
+    </div>
+
+    <!-- Q5B -->
+    <div class="section">
+      <div class="section-label">Question 6 of 11</div>
+      <div class="question">In which of the following areas do you also have significant coaching experience?</div>
+      <div class="sub">Select up to 2</div>
+      <label class="option"><input type="checkbox" name="q5b" value="Leadership and Management"><span class="option-text">Leadership and Management</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Executive (VP to C-suite)"><span class="option-text">Executive (VP to C-suite)</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Career and Transition"><span class="option-text">Career and Transition</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Health and Well-being"><span class="option-text">Health and Well-being</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Performance and Skill Development"><span class="option-text">Performance and Skill Development</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Entrepreneurial"><span class="option-text">Entrepreneurial</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Interpersonal Dynamics"><span class="option-text">Interpersonal Dynamics</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Meaning and Purpose"><span class="option-text">Meaning and Purpose</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="Communication and Presentation Skills"><span class="option-text">Communication and Presentation Skills</span></label>
+      <label class="option"><input type="checkbox" name="q5b" value="__other__"><span class="option-text">Other</span></label>
+      <div class="other-field" id="q5b-other-wrap">
+        <div class="other-label">Please specify:</div>
+        <input type="text" id="q5bother" placeholder="Additional specialty...">
+      </div>
+      <div class="counter" id="q5b-counter">0 of 2 selected</div>
+    </div>
+
+    <!-- Q6 (research) -->
+    <div class="section">
+      <div class="section-label">Question 7 of 11</div>
+      <div class="question">If someone you're coaching had a really difficult situation come up, which three approaches are you most likely to take?</div>
+      <div class="sub">Pick 3</div>
+      <label class="option"><input type="checkbox" name="q6" value="Help them find the right action to take"><span class="option-text">Help them find the right action to take</span></label>
+      <label class="option"><input type="checkbox" name="q6" value="Use relevant expertise to gain new learning"><span class="option-text">Use relevant expertise to gain new learning</span></label>
+      <label class="option"><input type="checkbox" name="q6" value="Help them diagnose the situation and come to a solution"><span class="option-text">Help them diagnose the situation and come to a solution</span></label>
+      <label class="option"><input type="checkbox" name="q6" value="Guide them to think critically and face a hard truth"><span class="option-text">Guide them to think critically and face a hard truth</span></label>
+      <label class="option"><input type="checkbox" name="q6" value="Invite them to become curious and open-minded"><span class="option-text">Invite them to become curious and open-minded</span></label>
+      <label class="option"><input type="checkbox" name="q6" value="Empathize with them and offer compassion"><span class="option-text">Empathize with them and offer compassion</span></label>
+      <label class="option"><input type="checkbox" name="q6" value="Encourage them to see this as a growth opportunity"><span class="option-text">Encourage them to see this as a growth opportunity</span></label>
+      <div class="counter" id="q6-counter">0 of 3 selected</div>
+      <div class="error" id="q6-error">Please select exactly 3 options.</div>
+    </div>
+
+    <!-- Q7 (research) -->
+    <div class="section">
+      <div class="section-label">Question 8 of 11</div>
+      <div class="question">If someone you're coaching just had a miscommunication with someone important to them, which three approaches are you most likely to take?</div>
+      <div class="sub">Pick 3</div>
+      <label class="option"><input type="checkbox" name="q7" value="Help them set a goal for the next interaction"><span class="option-text">Help them set a goal for the next interaction</span></label>
+      <label class="option"><input type="checkbox" name="q7" value="Reflect on learnings from this and similar situations"><span class="option-text">Reflect on learnings from this and similar situations</span></label>
+      <label class="option"><input type="checkbox" name="q7" value="Support them in figuring out how to fix it"><span class="option-text">Support them in figuring out how to fix it</span></label>
+      <label class="option"><input type="checkbox" name="q7" value="Help them take ownership, even if uncomfortable"><span class="option-text">Help them take ownership, even if uncomfortable</span></label>
+      <label class="option"><input type="checkbox" name="q7" value="Guide them to step back and get a bigger view"><span class="option-text">Guide them to step back and get a bigger view</span></label>
+      <label class="option"><input type="checkbox" name="q7" value="Invite them to share their feelings or emotions"><span class="option-text">Invite them to share their feelings or emotions</span></label>
+      <label class="option"><input type="checkbox" name="q7" value="Help them envision being their best self going forward"><span class="option-text">Help them envision being their best self going forward</span></label>
+      <div class="counter" id="q7-counter">0 of 3 selected</div>
+      <div class="error" id="q7-error">Please select exactly 3 options.</div>
+    </div>
+
+    <!-- Q8 (research) -->
+    <div class="section">
+      <div class="section-label">Question 9 of 11</div>
+      <div class="question">With someone you've been coaching, you've noticed a behavioral pattern that needs to be shared. Which of these are you most likely to do?</div>
+      <div class="sub">Select one</div>
+      <label class="option"><input type="radio" name="q8" value="Say it bluntly, so they are absolutely clear"><span class="option-num">1.</span><span class="option-text">Say it bluntly, so they are absolutely clear what you mean</span></label>
+      <label class="option"><input type="radio" name="q8" value="Say it clearly, so it's likely to be received"><span class="option-num">2.</span><span class="option-text">Say it clearly, so it's likely to be received</span></label>
+      <label class="option"><input type="radio" name="q8" value="Say it neutrally, then see what happens"><span class="option-num">3.</span><span class="option-text">Say it neutrally, then just see what happens</span></label>
+      <label class="option"><input type="radio" name="q8" value="Say it with softness, helping them take the feedback"><span class="option-num">4.</span><span class="option-text">Say it with a little softness, helping them take the feedback if they wish</span></label>
+      <label class="option"><input type="radio" name="q8" value="Gently allude to it, so they arrive at the conclusion themselves"><span class="option-num">5.</span><span class="option-text">Gently allude to it, so they arrive at the conclusion themselves — or not</span></label>
+      <div class="error" id="q8-error">Please select one option.</div>
+    </div>
+
+    <!-- Q9 + Q10 (research) -->
+    <div class="section">
+      <div class="section-label">Questions 10 – 11 of 11</div>
+      <div class="question" style="margin-bottom: 18px;">A few open-ended questions to wrap up.</div>
+
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px; line-height: 1.5;">What types of members do you find benefit most from working with you?</div>
+        <textarea id="q9" rows="4" placeholder="Share your thoughts..." style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:14px; background:#fafafa; outline:none; resize:vertical; font-family:inherit; line-height:1.5;"></textarea>
+      </div>
+
+      <div>
+        <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px; line-height: 1.5;">What types of members do you find most difficult to support — in terms of their background or the type of support they're seeking?</div>
+        <textarea id="q10" rows="4" placeholder="Share your thoughts..." style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:14px; background:#fafafa; outline:none; resize:vertical; font-family:inherit; line-height:1.5;"></textarea>
+        <div style="font-size:12px; color:#bbb; margin-top:6px;">Note: Not including members with low readiness, availability, or understanding of coaching.</div>
+      </div>
+    </div>
+
+    <button class="btn" id="submit-btn">See My Results</button>
+  </div>
+
+  <!-- ── RESULTS VIEW ── -->
+  <div id="results">
+    <div class="results-header">
+      <div class="name" id="res-name"></div>
+      <h2>Your RESPECT Style</h2>
+      <p>A summary of your coaching strengths and preferred style. This will be shared with your members before their first session with you.</p>
+      <div class="screenshot-note">📸 Screenshot these results if you'd like to reference them later.</div>
+    </div>
+
+    <div class="res-block">
+      <div class="res-section-label">Your Coaching Roles</div>
+      <div id="roles-list"></div>
+    </div>
+
+    <div class="res-block">
+      <div class="res-section-label">Your Coaching Style</div>
+      <div class="style-card">
+        <div class="style-card-title" id="style-level"></div>
+        <div class="style-card-desc" id="style-desc"></div>
+      </div>
+    </div>
+
+    <div class="res-block">
+      <div class="res-section-label">Your Areas of Expertise</div>
+      <div class="focus-tags" id="focus-tags"></div>
+    </div>
+
+    <span class="restart" id="restart-btn">Start over</span>
+
+    <div class="disclaimer">This assessment is active research. Results are summaries based on your self-reported preferences and are subject to change as the assessment matures over time.</div>
+  </div>
+
+</div>
+<script>
+var roleList = ['Rallier','Educator','Strategist','Provocateur','Explorer','Confidant','Transformer'];
+
+var roleDesc = {};
+roleDesc['Rallier']     = 'You help people build momentum, commit to concrete actions, and stay accountable to their goals.';
+roleDesc['Educator']    = 'You build practical skills, share relevant frameworks, and help people grow their capabilities.';
+roleDesc['Strategist']  = 'You serve as a true thought partner — helping people navigate complexity, cut through ambiguity, and solve hard problems.';
+roleDesc['Provocateur'] = 'You challenge assumptions, surface blind spots, and push people toward sharper, more honest thinking.';
+roleDesc['Explorer']    = 'You open up new possibilities, spark curiosity, and help people see their situation from fresh angles.';
+roleDesc['Confidant']   = 'You build deep trust and create a safe space for honest, authentic conversation.';
+roleDesc['Transformer'] = 'You work at the level of identity and mindset, helping people grow into their full potential.';
+
+/* ── Helpers ── */
+function getChecked(name) {
+  var els = document.querySelectorAll('input[name="' + name + '"]:checked'), vals = [];
+  for (var i = 0; i < els.length; i++) vals.push(els[i].value);
+  return vals;
+}
+
+function setupLimit(name, max, counterId) {
+  var boxes = document.querySelectorAll('input[name="' + name + '"]');
+  for (var i = 0; i < boxes.length; i++) {
+    boxes[i].addEventListener('change', function() {
+      var checked = document.querySelectorAll('input[name="' + name + '"]:checked');
+      if (checked.length > max) this.checked = false;
+      var n = document.querySelectorAll('input[name="' + name + '"]:checked').length;
+      document.getElementById(counterId).textContent = n + ' of ' + max + ' selected';
+    });
+  }
+}
+
+setupLimit('q1', 3, 'q1-counter');
+setupLimit('q4', 3, 'q4-counter');
+setupLimit('q6', 3, 'q6-counter');
+setupLimit('q7', 3, 'q7-counter');
+setupLimit('q5b', 2, 'q5b-counter');
+
+/* ── Show/hide "Other" text fields ── */
+(function() {
+  function toggleOther(radioName, wrapperId, inputId) {
+    var radios = document.querySelectorAll('input[name="' + radioName + '"]');
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].addEventListener('change', function() {
+        var wrap = document.getElementById(wrapperId);
+        if (this.value === '__other__' && this.checked) {
+          wrap.style.display = 'block';
+        } else {
+          wrap.style.display = 'none';
+          document.getElementById(inputId).value = '';
+        }
+      });
+    }
+  }
+  toggleOther('q5a', 'q5a-other-wrap', 'q5aother');
+
+  var q5bBoxes = document.querySelectorAll('input[name="q5b"]');
+  for (var i = 0; i < q5bBoxes.length; i++) {
+    q5bBoxes[i].addEventListener('change', function() {
+      var otherChecked = document.querySelector('input[name="q5b"][value="__other__"]:checked');
+      var wrap = document.getElementById('q5b-other-wrap');
+      if (otherChecked) {
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+        document.getElementById('q5bother').value = '';
+      }
+    });
+  }
+})();
+
+/* ── Submit ── */
+document.getElementById('submit-btn').addEventListener('click', function() {
+  var valid = true;
+
+  var name  = document.getElementById('fullName').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var q1    = getChecked('q1');
+  var q2el  = document.querySelector('input[name="q2"]:checked');
+  var q3el  = document.querySelector('input[name="q3"]:checked');
+  var q4    = getChecked('q4');
+  var q5ael = document.querySelector('input[name="q5a"]:checked');
+  var q5b   = getChecked('q5b');
+  var q6    = getChecked('q6');
+  var q7    = getChecked('q7');
+  var q8el  = document.querySelector('input[name="q8"]:checked');
+  var q9    = document.getElementById('q9').value.trim();
+  var q10   = document.getElementById('q10').value.trim();
+
+  /* Validate */
+  if (!name || !email) {
+    document.getElementById('info-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('info-error').style.display = 'none'; }
+
+  if (q1.length !== 3) {
+    document.getElementById('q1-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q1-error').style.display = 'none'; }
+
+  if (!q2el) {
+    document.getElementById('q2-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q2-error').style.display = 'none'; }
+
+  if (!q3el) {
+    document.getElementById('q3-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q3-error').style.display = 'none'; }
+
+  if (q4.length !== 3) {
+    document.getElementById('q4-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q4-error').style.display = 'none'; }
+
+  if (!q5ael) {
+    document.getElementById('q5a-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q5a-error').style.display = 'none'; }
+
+  if (q6.length !== 3) {
+    document.getElementById('q6-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q6-error').style.display = 'none'; }
+
+  if (q7.length !== 3) {
+    document.getElementById('q7-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q7-error').style.display = 'none'; }
+
+  if (!q8el) {
+    document.getElementById('q8-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('q8-error').style.display = 'none'; }
+
+  if (!valid) { window.scrollTo(0, 0); return; }
+
+  /* ── Score roles (Q1 + Q4, same logic as client app) ── */
+  var tally = {};
+  for (var i = 0; i < roleList.length; i++) tally[roleList[i]] = 0;
+  for (var i = 0; i < q1.length; i++) tally[q1[i]]++;
+  for (var i = 0; i < q4.length; i++) tally[q4[i]]++;
+
+  var primary = [], secondary = [];
+  for (var i = 0; i < roleList.length; i++) {
+    var r = roleList[i];
+    if (tally[r] === 2) primary.push(r);
+    else if (tally[r] === 1) secondary.push(r);
+  }
+  if (primary.length === 0) {
+    primary = q1.slice();
+    var secSet = [];
+    for (var i = 0; i < q4.length; i++) {
+      if (q1.indexOf(q4[i]) === -1) secSet.push(q4[i]);
+    }
+    secondary = secSet;
+  }
+
+  /* ── Score directiveness (Q2 + Q3) ── */
+  var dirScore = (parseInt(q2el.value) + parseInt(q3el.value)) / 2;
+  var styleLevel, styleDesc;
+  if (dirScore <= 1.4) {
+    styleLevel = 'Direct Style';
+    styleDesc  = 'Your coaching leans toward candid, perspective-forward sessions — you lead with direct feedback, honest observations, and clear challenge.';
+  } else if (dirScore <= 2.4) {
+    styleLevel = 'Balanced Style';
+    styleDesc  = 'Your coaching blends challenge and inquiry — you balance direct observations with open questions to meet people where they are.';
+  } else {
+    styleLevel = 'Inquiry-Led Style';
+    styleDesc  = 'Your coaching leans toward drawing people out — you lead with questions and share your own perspective sparingly, trusting the coachee to find their answers.';
+  }
+
+  /* ── Specialties (Q5A + Q5B combined as tags) ── */
+  var q5aVal = q5ael.value === '__other__'
+    ? (document.getElementById('q5aother').value.trim() || 'Other')
+    : q5ael.value;
+
+  var q5bVals = [];
+  for (var i = 0; i < q5b.length; i++) {
+    if (q5b[i] === '__other__') {
+      var oth = document.getElementById('q5bother').value.trim();
+      if (oth) q5bVals.push(oth); else q5bVals.push('Other');
+    } else {
+      q5bVals.push(q5b[i]);
+    }
+  }
+  var allSpecialties = [q5aVal].concat(q5bVals);
+
+  /* ── Render results ── */
+  var rolesHtml = '';
+  for (var i = 0; i < primary.length; i++) {
+    var r = primary[i];
+    rolesHtml += '<div class="role-card is-primary"><div class="role-card-header"><span class="role-card-name">' + r + '</span><span class="badge badge-primary">Primary</span></div><div class="role-card-desc">' + roleDesc[r] + '</div></div>';
+  }
+  for (var i = 0; i < secondary.length; i++) {
+    var r = secondary[i];
+    rolesHtml += '<div class="role-card"><div class="role-card-header"><span class="role-card-name">' + r + '</span><span class="badge badge-secondary">Secondary</span></div><div class="role-card-desc">' + roleDesc[r] + '</div></div>';
+  }
+  document.getElementById('roles-list').innerHTML = rolesHtml;
+  document.getElementById('res-name').textContent = name;
+  document.getElementById('style-level').textContent = styleLevel;
+  document.getElementById('style-desc').textContent = styleDesc;
+
+  var tagHtml = '';
+  for (var i = 0; i < allSpecialties.length; i++) {
+    tagHtml += '<span class="tag">' + allSpecialties[i] + '</span>';
+  }
+  document.getElementById('focus-tags').innerHTML = tagHtml;
+
+  /* ── Send to Google Sheets ── */
+  var payload = {
+    formType:          'coach',
+    fullName:          name,
+    email:             email,
+    q1:                q1.join(', '),
+    q2:                q2el.value === '1' ? 'Very direct' : q2el.value === '2' ? 'Balanced' : 'Tactful',
+    q3:                q3el.value === '1' ? 'Lean toward sharing perspective' : q3el.value === '2' ? 'Balance perspective with questions' : 'Lean toward asking questions',
+    q4:                q4.join(', '),
+    q5a:               q5aVal,
+    q5b:               q5bVals.join(', '),
+    primaryRoles:      primary.join(', '),
+    secondaryRoles:    secondary.join(', '),
+    directivenessScore: dirScore.toString(),
+    directivenessLevel: styleLevel,
+    q6:                q6.join(', '),
+    q7:                q7.join(', '),
+    q8:                q8el ? q8el.value : '',
+    q9:                q9,
+    q10:               q10
+  };
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://script.google.com/macros/s/AKfycbx73sTLKm_Adh02dh_g6LpOXBqE6w28JA2ssf0quVTJNMLBWtXQShhFCy1y8SjgURLfRg/exec', true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
+  xhr.send(JSON.stringify(payload));
+
+  document.getElementById('form-view').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo(0, 0);
+});
+
+document.getElementById('restart-btn').addEventListener('click', function() {
+  document.getElementById('form-view').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>
