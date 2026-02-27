@@ -18,8 +18,9 @@
   .field { margin-bottom: 16px; }
   .field:last-child { margin-bottom: 0; }
   .field label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
-  .field input[type="text"] { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa; outline: none; }
+  .field input[type="text"] { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa; outline: none; transition: border-color 0.15s; }
   .field input[type="text"]:focus { border-color: #4a4a4a; background: #fff; }
+  .field input[type="text"].input-error { border-color: #c0392b; background: #fff8f8; }
   .option { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0ee; cursor: pointer; }
   .option:last-of-type { border-bottom: none; }
   .option input { margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; }
@@ -55,6 +56,14 @@
   .res-block { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 16px; border: 1px solid #e8e8e6; }
   .disclaimer { font-size: 11px; color: #bbb; text-align: center; margin-top: 28px; line-height: 1.7; padding: 0 8px; }
   .restart { display: block; text-align: center; font-size: 13px; color: #999; margin-top: 16px; cursor: pointer; text-decoration: underline; }
+
+  /* Status banner */
+  #status-banner { display: none; border-radius: 10px; padding: 13px 18px; margin-bottom: 16px; font-size: 14px; line-height: 1.5; align-items: center; gap: 10px; }
+  #status-banner.saving { display: flex; background: #f4f4f2; border: 1px solid #ddd; color: #555; }
+  #status-banner.saved  { display: flex; background: #f0faf3; border: 1px solid #a8dbb8; color: #1e6e3e; }
+  #status-banner.failed { display: flex; background: #fff5f5; border: 1px solid #f0b8b8; color: #962020; }
+  #status-banner .banner-msg { flex: 1; }
+  #retry-btn { background: none; border: none; font-size: 14px; font-weight: 600; color: inherit; cursor: pointer; text-decoration: underline; white-space: nowrap; padding: 0; }
 </style>
 </head>
 <body>
@@ -73,12 +82,13 @@
       <div class="field">
         <label>Full name</label>
         <input type="text" id="fullName" placeholder="First and last name">
+        <div class="error" id="name-error">Please enter your full name.</div>
       </div>
       <div class="field">
         <label>BetterUp email address</label>
         <input type="text" id="email" placeholder="you@betterup.com">
+        <div class="error" id="email-error">Please enter your email address.</div>
       </div>
-      <div class="error" id="info-error">Please enter your name and email address.</div>
     </div>
 
     <!-- Q1 -->
@@ -148,8 +158,8 @@
       <label class="option"><input type="radio" name="q5a" value="Managing their time and priorities"><span class="option-text">Managing their time and priorities</span></label>
       <label class="option"><input type="radio" name="q5a" value="Managing stress and finding better balance"><span class="option-text">Managing stress and finding better balance</span></label>
       <label class="option"><input type="radio" name="q5a" value="Improving their physical health and habits"><span class="option-text">Improving their physical health and habits</span></label>
-      <label class="option"><input type="radio" name="q5a" value="Finding more purpose and fulfillment"><span class="option-text">Finding more purpose and fulfillment</span></label>       
-     <label class="option"><input type="radio" name="q5a" value="Thinking through difficult or high-stakes decisions"><span class="option-text">Thinking through difficult or high-stakes decisions</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Finding more purpose and fulfillment"><span class="option-text">Finding more purpose and fulfillment</span></label>
+      <label class="option"><input type="radio" name="q5a" value="Thinking through difficult or high-stakes decisions"><span class="option-text">Thinking through difficult or high-stakes decisions</span></label>
       <label class="option"><input type="radio" name="q5a" value="__other__"><span class="option-text">Other</span></label>
       <div class="other-field" id="q5a-other-wrap">
         <div class="other-label">Please specify:</div>
@@ -181,7 +191,7 @@
       <div class="counter" id="q5b-counter">0 of 2 selected</div>
     </div>
 
-    <!-- Q6 (research) -->
+    <!-- Q6 -->
     <div class="section">
       <div class="section-label">Question 7 of 11</div>
       <div class="question">If someone you're coaching had a really difficult situation come up, which three approaches are you most likely to take?</div>
@@ -197,7 +207,7 @@
       <div class="error" id="q6-error">Please select exactly 3 options.</div>
     </div>
 
-    <!-- Q7 (research) -->
+    <!-- Q7 -->
     <div class="section">
       <div class="section-label">Question 8 of 11</div>
       <div class="question">If someone you're coaching just had a miscommunication with someone important to them, which three approaches are you most likely to take?</div>
@@ -213,7 +223,7 @@
       <div class="error" id="q7-error">Please select exactly 3 options.</div>
     </div>
 
-    <!-- Q8 (research) -->
+    <!-- Q8 -->
     <div class="section">
       <div class="section-label">Question 9 of 11</div>
       <div class="question">With someone you've been coaching, you've noticed a behavioral pattern that needs to be shared. Which of these are you most likely to do?</div>
@@ -226,16 +236,14 @@
       <div class="error" id="q8-error">Please select one option.</div>
     </div>
 
-    <!-- Q9 + Q10 (research) -->
+    <!-- Q9 + Q10 -->
     <div class="section">
       <div class="section-label">Questions 10 – 11 of 11</div>
       <div class="question" style="margin-bottom: 18px;">A few open-ended questions to wrap up.</div>
-
       <div style="margin-bottom: 24px;">
         <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px; line-height: 1.5;">What types of members do you find benefit most from working with you?</div>
         <textarea id="q9" rows="4" placeholder="Share your thoughts..." style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:14px; background:#fafafa; outline:none; resize:vertical; font-family:inherit; line-height:1.5;"></textarea>
       </div>
-
       <div>
         <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px; line-height: 1.5;">What types of members do you find most difficult to support — in terms of their background or the type of support they're seeking?</div>
         <textarea id="q10" rows="4" placeholder="Share your thoughts..." style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:14px; background:#fafafa; outline:none; resize:vertical; font-family:inherit; line-height:1.5;"></textarea>
@@ -253,6 +261,12 @@
       <h2>Your RESPECT Style</h2>
       <p>A summary of your coaching strengths and preferred style. This will be shared with your members before their first session with you.</p>
       <div class="screenshot-note">📸 Screenshot these results if you'd like to reference them later.</div>
+    </div>
+
+    <!-- Status banner -->
+    <div id="status-banner">
+      <span class="banner-msg" id="banner-msg"></span>
+      <button id="retry-btn" style="display:none;" onclick="sendPayload(currentPayload, 1)">Retry now</button>
     </div>
 
     <div class="res-block">
@@ -274,14 +288,12 @@
     </div>
 
     <span class="restart" id="restart-btn">Start over</span>
-
     <div class="disclaimer">This assessment is active research. Results are summaries based on your self-reported preferences and are subject to change as the assessment matures over time.</div>
   </div>
 
 </div>
 <script>
 var roleList = ['Rallier','Educator','Strategist','Provocateur','Explorer','Confidant','Transformer'];
-
 var roleDesc = {};
 roleDesc['Rallier']     = 'You help people build momentum, commit to concrete actions, and stay accountable to their goals.';
 roleDesc['Educator']    = 'You build practical skills, share relevant frameworks, and help people grow their capabilities.';
@@ -290,6 +302,52 @@ roleDesc['Provocateur'] = 'You challenge assumptions, surface blind spots, and p
 roleDesc['Explorer']    = 'You open up new possibilities, spark curiosity, and help people see their situation from fresh angles.';
 roleDesc['Confidant']   = 'You build deep trust and create a safe space for honest, authentic conversation.';
 roleDesc['Transformer'] = 'You work at the level of identity and mindset, helping people grow into their full potential.';
+
+var currentPayload = null;
+var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx73sTLKm_Adh02dh_g6LpOXBqE6w28JA2ssf0quVTJNMLBWtXQShhFCy1y8SjgURLfRg/exec';
+var MAX_ATTEMPTS = 3;
+var RETRY_DELAY  = 2000;
+var TIMEOUT_MS   = 12000;
+
+/* ── Status banner helpers ── */
+function showBanner(state, msg, showRetry) {
+  var b = document.getElementById('status-banner');
+  b.className = state; // 'saving' | 'saved' | 'failed'
+  document.getElementById('banner-msg').textContent = msg;
+  document.getElementById('retry-btn').style.display = showRetry ? 'inline' : 'none';
+}
+
+/* ── Reliable send with retry ── */
+function sendPayload(payload, attempt) {
+  currentPayload = payload;
+  showBanner('saving', '⏳ Saving your responses…', false);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', ENDPOINT, true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
+  xhr.timeout = TIMEOUT_MS;
+
+  xhr.onload = function() {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      showBanner('saved', '✓ Your responses have been saved successfully.', false);
+    } else {
+      handleFailure(payload, attempt);
+    }
+  };
+
+  xhr.onerror = function() { handleFailure(payload, attempt); };
+  xhr.ontimeout = function() { handleFailure(payload, attempt); };
+
+  xhr.send(JSON.stringify(payload));
+}
+
+function handleFailure(payload, attempt) {
+  if (attempt < MAX_ATTEMPTS) {
+    setTimeout(function() { sendPayload(payload, attempt + 1); }, RETRY_DELAY);
+  } else {
+    showBanner('failed', '⚠️ We couldn\'t save your responses.', true);
+  }
+}
 
 /* ── Helpers ── */
 function getChecked(name) {
@@ -315,6 +373,20 @@ setupLimit('q4', 3, 'q4-counter');
 setupLimit('q6', 3, 'q6-counter');
 setupLimit('q7', 3, 'q7-counter');
 setupLimit('q5b', 2, 'q5b-counter');
+
+/* ── Live validation clearing for name / email ── */
+document.getElementById('fullName').addEventListener('input', function() {
+  if (this.value.trim()) {
+    this.classList.remove('input-error');
+    document.getElementById('name-error').style.display = 'none';
+  }
+});
+document.getElementById('email').addEventListener('input', function() {
+  if (this.value.trim()) {
+    this.classList.remove('input-error');
+    document.getElementById('email-error').style.display = 'none';
+  }
+});
 
 /* ── Show/hide "Other" text fields ── */
 (function() {
@@ -353,60 +425,63 @@ setupLimit('q5b', 2, 'q5b-counter');
 document.getElementById('submit-btn').addEventListener('click', function() {
   var valid = true;
 
-  var name  = document.getElementById('fullName').value.trim();
-  var email = document.getElementById('email').value.trim();
-  var q1    = getChecked('q1');
-  var q2el  = document.querySelector('input[name="q2"]:checked');
-  var q3el  = document.querySelector('input[name="q3"]:checked');
-  var q4    = getChecked('q4');
-  var q5ael = document.querySelector('input[name="q5a"]:checked');
-  var q5b   = getChecked('q5b');
-  var q6    = getChecked('q6');
-  var q7    = getChecked('q7');
-  var q8el  = document.querySelector('input[name="q8"]:checked');
-  var q9    = document.getElementById('q9').value.trim();
-  var q10   = document.getElementById('q10').value.trim();
+  var nameEl  = document.getElementById('fullName');
+  var emailEl = document.getElementById('email');
+  var name    = nameEl.value.trim();
+  var email   = emailEl.value.trim();
 
-  /* Validate */
-  if (!name || !email) {
-    document.getElementById('info-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('info-error').style.display = 'none'; }
+  /* Validate name */
+  if (!name) {
+    nameEl.classList.add('input-error');
+    document.getElementById('name-error').style.display = 'block';
+    valid = false;
+  } else {
+    nameEl.classList.remove('input-error');
+    document.getElementById('name-error').style.display = 'none';
+  }
 
-  if (q1.length !== 3) {
-    document.getElementById('q1-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q1-error').style.display = 'none'; }
+  /* Validate email */
+  if (!email) {
+    emailEl.classList.add('input-error');
+    document.getElementById('email-error').style.display = 'block';
+    valid = false;
+  } else {
+    emailEl.classList.remove('input-error');
+    document.getElementById('email-error').style.display = 'none';
+  }
 
-  if (!q2el) {
-    document.getElementById('q2-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q2-error').style.display = 'none'; }
+  var q1   = getChecked('q1');
+  var q2el = document.querySelector('input[name="q2"]:checked');
+  var q3el = document.querySelector('input[name="q3"]:checked');
+  var q4   = getChecked('q4');
+  var q5ael= document.querySelector('input[name="q5a"]:checked');
+  var q5b  = getChecked('q5b');
+  var q6   = getChecked('q6');
+  var q7   = getChecked('q7');
+  var q8el = document.querySelector('input[name="q8"]:checked');
+  var q9   = document.getElementById('q9').value.trim();
+  var q10  = document.getElementById('q10').value.trim();
 
-  if (!q3el) {
-    document.getElementById('q3-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q3-error').style.display = 'none'; }
-
-  if (q4.length !== 3) {
-    document.getElementById('q4-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q4-error').style.display = 'none'; }
-
-  if (!q5ael) {
-    document.getElementById('q5a-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q5a-error').style.display = 'none'; }
-
-  if (q6.length !== 3) {
-    document.getElementById('q6-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q6-error').style.display = 'none'; }
-
-  if (q7.length !== 3) {
-    document.getElementById('q7-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q7-error').style.display = 'none'; }
-
-  if (!q8el) {
-    document.getElementById('q8-error').style.display = 'block'; valid = false;
-  } else { document.getElementById('q8-error').style.display = 'none'; }
+  if (q1.length !== 3)  { document.getElementById('q1-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q1-error').style.display = 'none'; }
+  if (!q2el)            { document.getElementById('q2-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q2-error').style.display = 'none'; }
+  if (!q3el)            { document.getElementById('q3-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q3-error').style.display = 'none'; }
+  if (q4.length !== 3)  { document.getElementById('q4-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q4-error').style.display = 'none'; }
+  if (!q5ael)           { document.getElementById('q5a-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q5a-error').style.display = 'none'; }
+  if (q6.length !== 3)  { document.getElementById('q6-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q6-error').style.display = 'none'; }
+  if (q7.length !== 3)  { document.getElementById('q7-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q7-error').style.display = 'none'; }
+  if (!q8el)            { document.getElementById('q8-error').style.display = 'block'; valid = false; }
+  else                  { document.getElementById('q8-error').style.display = 'none'; }
 
   if (!valid) { window.scrollTo(0, 0); return; }
 
-  /* ── Score roles (Q1 + Q4, same logic as client app) ── */
+  /* ── Score roles ── */
   var tally = {};
   for (var i = 0; i < roleList.length; i++) tally[roleList[i]] = 0;
   for (var i = 0; i < q1.length; i++) tally[q1[i]]++;
@@ -427,7 +502,7 @@ document.getElementById('submit-btn').addEventListener('click', function() {
     secondary = secSet;
   }
 
-  /* ── Score directiveness (Q2 + Q3) ── */
+  /* ── Score directiveness ── */
   var dirScore = (parseInt(q2el.value) + parseInt(q3el.value)) / 2;
   var styleLevel, styleDesc;
   if (dirScore <= 1.4) {
@@ -441,16 +516,15 @@ document.getElementById('submit-btn').addEventListener('click', function() {
     styleDesc  = 'Your coaching leans toward drawing people out — you lead with questions and share your own perspective sparingly, trusting the coachee to find their answers.';
   }
 
-  /* ── Specialties (Q5A + Q5B combined as tags) ── */
+  /* ── Specialties ── */
   var q5aVal = q5ael.value === '__other__'
     ? (document.getElementById('q5aother').value.trim() || 'Other')
     : q5ael.value;
-
   var q5bVals = [];
   for (var i = 0; i < q5b.length; i++) {
     if (q5b[i] === '__other__') {
       var oth = document.getElementById('q5bother').value.trim();
-      if (oth) q5bVals.push(oth); else q5bVals.push('Other');
+      q5bVals.push(oth || 'Other');
     } else {
       q5bVals.push(q5b[i]);
     }
@@ -473,41 +547,37 @@ document.getElementById('submit-btn').addEventListener('click', function() {
   document.getElementById('style-desc').textContent = styleDesc;
 
   var tagHtml = '';
-  for (var i = 0; i < allSpecialties.length; i++) {
-    tagHtml += '<span class="tag">' + allSpecialties[i] + '</span>';
-  }
+  for (var i = 0; i < allSpecialties.length; i++) tagHtml += '<span class="tag">' + allSpecialties[i] + '</span>';
   document.getElementById('focus-tags').innerHTML = tagHtml;
 
-  /* ── Send to Google Sheets ── */
-  var payload = {
-    formType:          'coach',
-    fullName:          name,
-    email:             email,
-    q1:                q1.join(', '),
-    q2:                q2el.value === '1' ? 'Very direct' : q2el.value === '2' ? 'Balanced' : 'Tactful',
-    q3:                q3el.value === '1' ? 'Lean toward sharing perspective' : q3el.value === '2' ? 'Balance perspective with questions' : 'Lean toward asking questions',
-    q4:                q4.join(', '),
-    q5a:               q5aVal,
-    q5b:               q5bVals.join(', '),
-    primaryRoles:      primary.join(', '),
-    secondaryRoles:    secondary.join(', '),
-    directivenessScore: dirScore.toString(),
-    directivenessLevel: styleLevel,
-    q6:                q6.join(', '),
-    q7:                q7.join(', '),
-    q8:                q8el ? q8el.value : '',
-    q9:                q9,
-    q10:               q10
-  };
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://script.google.com/macros/s/AKfycbx73sTLKm_Adh02dh_g6LpOXBqE6w28JA2ssf0quVTJNMLBWtXQShhFCy1y8SjgURLfRg/exec', true);
-  xhr.setRequestHeader('Content-Type', 'text/plain');
-  xhr.send(JSON.stringify(payload));
-
+  /* ── Switch to results view FIRST, then send ── */
   document.getElementById('form-view').style.display = 'none';
   document.getElementById('results').style.display = 'block';
   window.scrollTo(0, 0);
+
+  /* ── Build payload and send ── */
+  var payload = {
+    formType:           'coach',
+    fullName:           name,
+    email:              email,
+    q1:                 q1.join(', '),
+    q2:                 q2el.value === '1' ? 'Very direct' : q2el.value === '2' ? 'Balanced' : 'Tactful',
+    q3:                 q3el.value === '1' ? 'Lean toward sharing perspective' : q3el.value === '2' ? 'Balance perspective with questions' : 'Lean toward asking questions',
+    q4:                 q4.join(', '),
+    q5a:                q5aVal,
+    q5b:                q5bVals.join(', '),
+    primaryRoles:       primary.join(', '),
+    secondaryRoles:     secondary.join(', '),
+    directivenessScore: dirScore.toString(),
+    directivenessLevel: styleLevel,
+    q6:                 q6.join(', '),
+    q7:                 q7.join(', '),
+    q8:                 q8el ? q8el.value : '',
+    q9:                 q9,
+    q10:                q10
+  };
+
+  sendPayload(payload, 1);
 });
 
 document.getElementById('restart-btn').addEventListener('click', function() {
